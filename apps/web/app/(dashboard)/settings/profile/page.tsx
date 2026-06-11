@@ -56,8 +56,13 @@ export default async function ProfileSettingsPage() {
             {!user.emailVerifiedAt && (
               <p className="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
                 ⚠ Email not verified.{" "}
-                <a href="/api/auth/verify-email/resend" className="underline hover:text-foreground">
-                  Resend verification
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                <a
+                  href="/api/auth/verify-email/resend"
+                  id="resend-verification-btn"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Resend verification email
                 </a>
               </p>
             )}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { validateRequest } from "@saas/auth";
 import { db } from "@saas/db";
-import { memberships, organizations } from "@saas/db/schema";
+import { memberships } from "@saas/db/schema";
 import { eq } from "drizzle-orm";
 
 export const metadata: Metadata = {

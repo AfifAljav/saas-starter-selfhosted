@@ -2,13 +2,13 @@ import { Lucia, TimeSpan } from "lucia";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { db } from "@saas/db";
 import { sessions, users } from "@saas/db/schema";
-import type { User } from "@saas/db";
+
 
 // ---------------------------------------------------------------------------
 // Lucia v3 — self-hosted session management
 // ---------------------------------------------------------------------------
 
-const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
+const adapter = new DrizzlePostgreSQLAdapter(db as any, sessions as any, users as any);
 
 export const lucia = new Lucia(adapter, {
   sessionExpiresIn: new TimeSpan(30, "d"), // 30-day sessions (remember me)
@@ -36,10 +36,13 @@ export const lucia = new Lucia(adapter, {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Pick<
-      User,
-      "id" | "email" | "name" | "avatarUrl" | "emailVerifiedAt"
-    >;
+    DatabaseUserAttributes: {
+      id: string;
+      email: string;
+      name: string;
+      avatarUrl: string | null;
+      emailVerifiedAt: Date | null;
+    };
   }
 }
 
@@ -67,7 +70,7 @@ export const verifyPassword = (hash: string, password: string): Promise<boolean>
 import { cookies } from "next/headers";
 import type { Session } from "lucia";
 
-export type AuthUser = Lucia["__types"]["DatabaseUserAttributes"] & { id: string };
+export type AuthUser = import("lucia").User;
 
 /**
  * Validates the current request's session cookie.

@@ -25,6 +25,7 @@ export default async function LoginPage() {
 
         {/* OAuth buttons */}
         <div className="space-y-3">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/api/auth/github"
             id="login-github-btn"
@@ -35,6 +36,7 @@ export default async function LoginPage() {
             </svg>
             Continue with GitHub
           </a>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/api/auth/google"
             id="login-google-btn"

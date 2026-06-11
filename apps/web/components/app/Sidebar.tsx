@@ -7,9 +7,7 @@ import {
   Users,
   CreditCard,
   User,
-  Settings,
   LogOut,
-  ChevronRight,
 } from "lucide-react";
 
 const navigation = [

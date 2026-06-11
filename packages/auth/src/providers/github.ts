@@ -11,9 +11,7 @@ import { env } from "@saas/config/env";
 export const github = new GitHub(
   env.GITHUB_CLIENT_ID ?? "",
   env.GITHUB_CLIENT_SECRET ?? "",
-  {
-    redirectURI: `${env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback`,
-  },
+  `${env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback`
 );
 
 export interface GitHubUser {

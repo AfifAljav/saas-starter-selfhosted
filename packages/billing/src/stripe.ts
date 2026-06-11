@@ -12,9 +12,12 @@ import type {
 // Stripe implementation of BillingAdapter
 // ---------------------------------------------------------------------------
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY ?? "", {
-  apiVersion: "2025-05-28.basil",
-  typescript: true,
+export const stripe = new Stripe(env.STRIPE_SECRET_KEY ?? "", {
+  apiVersion: "2025-02-24.acacia",
+  appInfo: {
+    name: "saas-starter",
+    version: "1.0.0",
+  },
 });
 
 /**

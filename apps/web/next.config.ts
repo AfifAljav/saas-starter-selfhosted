@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
   // Bundle analyzer support — set ANALYZE=true to generate report
   ...(process.env.ANALYZE === "true"
     ? {
-        webpack(config: import("webpack").Configuration) {
+        webpack(config: any) {
           return config;
         },
       }

@@ -24,6 +24,7 @@ export default async function RegisterPage() {
 
         {/* OAuth buttons */}
         <div className="space-y-3">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/api/auth/github"
             id="register-github-btn"
@@ -34,6 +35,7 @@ export default async function RegisterPage() {
             </svg>
             Sign up with GitHub
           </a>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/api/auth/google"
             id="register-google-btn"
