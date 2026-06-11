@@ -1,0 +1,24 @@
+{
+  "name": "@saas/billing",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./adapter": "./src/adapter.ts",
+    "./stripe": "./src/stripe.ts",
+    "./paddle": "./src/paddle.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@saas/config": "*",
+    "stripe": "^17.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22.15.29"
+  }
+}

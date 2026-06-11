@@ -1,0 +1,56 @@
+# Caddyfile — Reverse proxy configuration
+# Replace "yourdomain.com" with your actual domain.
+# Caddy automatically provisions TLS certificates from Let's Encrypt.
+#
+# For local testing with compose.dev.yml, Caddy is disabled — use ports directly.
+
+{
+  # Global options
+  email admin@yourdomain.com
+  # Uncomment for staging/testing to avoid rate limits:
+  # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+# ── Main app ──────────────────────────────────────────────────────────────────
+yourdomain.com {
+  reverse_proxy app:3000 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+
+  # Security headers
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    -Server
+  }
+
+  # Gzip compression
+  encode gzip
+
+  log {
+    output file /var/log/caddy/app.log
+    format json
+  }
+}
+
+# ── Umami Analytics ───────────────────────────────────────────────────────────
+analytics.yourdomain.com {
+  reverse_proxy umami:3000 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+  }
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    -Server
+  }
+
+  encode gzip
+}

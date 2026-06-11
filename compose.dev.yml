@@ -1,0 +1,54 @@
+# compose.dev.yml — Local development overrides
+# Usage: docker compose -f compose.yml -f compose.dev.yml up
+#
+# Changes from production:
+#   - Caddy removed (no TLS needed locally)
+#   - App hot-reloads via volume mount
+#   - Mailhog added for local SMTP (UI at http://localhost:8025)
+#   - Ports exposed on localhost for direct access
+
+services:
+  app:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    container_name: saas_app_dev
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    command: npm run dev
+
+  db:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  umami:
+    ports:
+      - "3001:3000"
+
+  # ── Mailhog (local SMTP + web UI) ────────────────────────────────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: saas_mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI — open http://localhost:8025
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── Disable Caddy in dev ─────────────────────────────────────────────────────
+  caddy:
+    profiles:
+      - disabled

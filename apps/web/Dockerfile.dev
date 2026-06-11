@@ -1,0 +1,16 @@
+# Dev Dockerfile — hot reload, no production optimizations
+FROM node:20-alpine
+WORKDIR /app
+
+RUN apk add --no-cache libc6-compat python3 make g++
+
+# Install dependencies first for layer caching
+COPY package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/*/package.json ./packages/
+
+RUN npm install --workspaces
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev", "--workspace=apps/web"]

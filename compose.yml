@@ -1,0 +1,95 @@
+services:
+  # ── Next.js Application ─────────────────────────────────────────────────────
+  app:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: saas_app
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── PostgreSQL 16 ────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: saas_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-saas}
+      POSTGRES_USER: ${DB_USER:-saas}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-saas} -d ${DB_NAME:-saas}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── Redis 7 ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: saas_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── Umami Analytics ──────────────────────────────────────────────────────────
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: saas_umami
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-saas}:${DB_PASSWORD}@db:5432/${DB_NAME:-saas}
+      APP_SECRET: ${UMAMI_APP_SECRET:?UMAMI_APP_SECRET is required}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── Caddy (Reverse Proxy + Automatic HTTPS) ──────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: saas_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+      - umami
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:
+    driver: bridge
