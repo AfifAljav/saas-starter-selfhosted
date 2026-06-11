@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   description: "Reset your account password",
 };
 
-export default function ResetPasswordPage({
+export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: { token?: string; step?: string };
+  searchParams: Promise<{ token?: string; step?: string }>;
 }) {
-  const { token, step } = searchParams;
+  const { token, step } = await searchParams;
 
   // Step 2: token is present — show new password form
   if (token) {

@@ -22,10 +22,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          # No lockfile cache — package-lock.json is not committed
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run linting
         run: npm run lint
@@ -45,14 +45,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build all packages
         env:
-          # Minimal env vars required for build
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_APP_NAME: SaaS Starter
           DATABASE_URL: postgresql://saas:saas@localhost:5432/saas
@@ -61,6 +59,8 @@ jobs:
           EMAIL_PROVIDER: smtp
           EMAIL_FROM: noreply@example.com
           BILLING_PROVIDER: stripe
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
         run: npm run build
 
   docker-compose-validate:
@@ -69,6 +69,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Create mock .env for validation
+        run: |
+          cp .env.example .env
+          echo "DB_PASSWORD=ci_mock_password" >> .env
+          echo "UMAMI_APP_SECRET=ci_mock_umami_secret" >> .env
+          echo "AUTH_SECRET=ci-mock-secret-32-chars-longXXXXXX" >> .env
 
       - name: Validate compose.yml
         run: docker compose -f compose.yml config --quiet

@@ -22,7 +22,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-saas}
       POSTGRES_USER: ${DB_USER:-saas}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -56,8 +56,8 @@ services:
     image: ghcr.io/umami-software/umami:postgresql-latest
     container_name: saas_umami
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-saas}:${DB_PASSWORD}@db:5432/${DB_NAME:-saas}
-      APP_SECRET: ${UMAMI_APP_SECRET:?UMAMI_APP_SECRET is required}
+      DATABASE_URL: postgresql://${DB_USER:-saas}:${DB_PASSWORD:-changeme}@db:5432/${DB_NAME:-saas}
+      APP_SECRET: ${UMAMI_APP_SECRET:-changeme-umami-secret}
     depends_on:
       db:
         condition: service_healthy

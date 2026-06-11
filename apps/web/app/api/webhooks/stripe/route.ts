@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { billing } from "@saas/billing";
 import { db } from "@saas/db";
-import { subscriptions, billingEvents, organizations, memberships } from "@saas/db/schema";
+import { subscriptions, billingEvents, memberships, users } from "@saas/db/schema";
 import { eq, and } from "drizzle-orm";
 import { sendEmail } from "@saas/email";
 import {
@@ -9,12 +9,9 @@ import {
   SubscriptionFailedTemplate,
   SubscriptionCancelledTemplate,
 } from "@saas/email";
-import { users } from "@saas/db/schema";
 import React from "react";
 import { env } from "@saas/config/env";
 
-// Stripe requires the raw body for signature verification
-export const config = { api: { bodyParser: false } };
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();

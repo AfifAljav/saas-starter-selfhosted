@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { validateRequest } from "@saas/auth";
 import { db } from "@saas/db";
 import { memberships, organizations, users, invites } from "@saas/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
+
 
 export const metadata: Metadata = {
   title: "Team Settings",
@@ -47,7 +48,8 @@ export default async function TeamSettingsPage() {
   const pendingInvites = await db
     .select()
     .from(invites)
-    .where(and(eq(invites.orgId, org.id), eq(invites.acceptedAt, null as never)));
+    .where(and(eq(invites.orgId, org.id), isNull(invites.acceptedAt)));
+
 
   return (
     <div className="space-y-6 max-w-4xl">

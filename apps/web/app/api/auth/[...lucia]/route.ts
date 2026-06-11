@@ -5,12 +5,10 @@ import {
   users,
   emailVerificationTokens,
   passwordResetTokens,
-  sessions,
 } from "@saas/db/schema";
 import { eq } from "drizzle-orm";
 import { sendEmail } from "@saas/email";
 import { VerifyEmailTemplate, ResetPasswordTemplate } from "@saas/email";
-import { createId } from "@paralleldrive/cuid2";
 import { createHash, randomBytes } from "crypto";
 import React from "react";
 import { env } from "@saas/config/env";
@@ -28,10 +26,11 @@ function generateToken(): { raw: string; hash: string } {
 // Route handlers
 // ---------------------------------------------------------------------------
 
-type Params = { params: { lucia: string[] } };
+type Params = { params: Promise<{ lucia: string[] }> };
 
 export async function POST(request: NextRequest, { params }: Params) {
-  const [action, ...rest] = params.lucia;
+  const { lucia: luciaParams } = await params;
+  const [action] = luciaParams;
 
   switch (action) {
     case "login":
@@ -48,7 +47,8 @@ export async function POST(request: NextRequest, { params }: Params) {
 }
 
 export async function GET(request: NextRequest, { params }: Params) {
-  const [action] = params.lucia;
+  const { lucia: luciaParams } = await params;
+  const [action] = luciaParams;
 
   switch (action) {
     case "github":
@@ -139,7 +139,7 @@ async function handleRegister(request: NextRequest) {
   }
 
   const hashedPassword = await hashPassword(password);
-  const userId = createId();
+  const userId = crypto.randomUUID();
 
   await db.insert(users).values({
     id: userId,
